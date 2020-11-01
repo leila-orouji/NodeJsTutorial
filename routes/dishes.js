@@ -2,6 +2,7 @@
 const express = require('express')
 const dishRouter = express.Router();
 const Dishes = require('../models/dishes');
+const authenticate = require('../authenticate');
 
 dishRouter.get('/' , async(req,res,next)=>{
     try {
@@ -12,7 +13,7 @@ dishRouter.get('/' , async(req,res,next)=>{
     }
 })
 
-dishRouter.post( '/' ,async(req,res,next)=>{
+dishRouter.post( '/' ,authenticate.verifyUser, async(req,res,next)=>{
     try {
         let {name, description, image, category, label, price, featured }= req.body;
         let newDish = new Dishes({name, description, image, category, label, price, featured });
@@ -25,7 +26,7 @@ dishRouter.post( '/' ,async(req,res,next)=>{
 })
 
 
-dishRouter.put('/', async (req,res,next)=>{
+dishRouter.put('/', authenticate.verifyUser, async (req,res,next)=>{
     try {
         res.statusCode = 403;
         res.end('Put operation is not supported on dishes.');
@@ -35,7 +36,7 @@ dishRouter.put('/', async (req,res,next)=>{
 })
 
 
-dishRouter.delete('/', async(req,res,next)=>{
+dishRouter.delete('/', authenticate.verifyUser, async(req,res,next)=>{
     try {
         let dishes = await Dishes.find({}).exec();  
         dishes.forEach(async(dish)=> await dish.remove())
@@ -54,7 +55,7 @@ dishRouter.get('/:dishId' , async(req,res,next)=>{
     }
 })
 
-dishRouter.post('/:dishId' , async(req,res,next)=>{
+dishRouter.post('/:dishId' , authenticate.verifyUser, async(req,res,next)=>{
     try {
         res.statusCode = 403;
         res.end('Post operation is not supported on dishes.');
@@ -63,7 +64,7 @@ dishRouter.post('/:dishId' , async(req,res,next)=>{
     }
 });
 
-dishRouter.put('/:dishId' , async(req,res,next)=>{
+dishRouter.put('/:dishId' , authenticate.verifyUser, async(req,res,next)=>{
     try {
         const dish = await Dishes.findById(req.params.dishId).exec();      
         await Dishes.findByIdAndUpdate(
@@ -77,7 +78,7 @@ dishRouter.put('/:dishId' , async(req,res,next)=>{
     }
 })
 
-dishRouter.delete('/:dishId' ,async (req,res,next)=>{
+dishRouter.delete('/:dishId' ,authenticate.verifyUser, async (req,res,next)=>{
     try {
         let dish = await Dishes.findById(req.params.dishId).exec();  
         await dish.remove(); 

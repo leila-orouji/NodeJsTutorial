@@ -2,6 +2,7 @@ const express = require('express')
 const commentRouter = express.Router();
 const Comments = require('../models/comments');
 const Dishes = require('../models/dishes');
+const authenticate = require('../authenticate');
 
 commentRouter.route('/:dishId/comments')
 .get( async(req,res,next)=>{
@@ -22,7 +23,7 @@ commentRouter.route('/:dishId/comments')
 })
 
 
-.post( async(req,res,next)=>{
+.post(authenticate.verifyUser, async(req,res,next)=>{
     try {
         let dishes = await Dishes.findById(req.params.dishId).populated({
             path: 'comments'
@@ -42,7 +43,7 @@ commentRouter.route('/:dishId/comments')
     }
 })
 
-.put( async (req,res,next)=>{
+.put( authenticate.verifyUser, async (req,res,next)=>{
     try {
         res.statusCode = 403;
         res.end('Put operation is not supported on commnets.');
@@ -52,7 +53,7 @@ commentRouter.route('/:dishId/comments')
 })
 
 
-.delete(async(req,res,next)=>{
+.delete(authenticate.verifyUser, async(req,res,next)=>{
     try {
         // let comments = await Comments.find({dishId: req.params.dishId}).exec()
         let dishes = await Dishes.findById(req.params.dishId).populated({
@@ -86,7 +87,7 @@ commentRouter.route('/:dishId/comments/:commentId' )
     }
 })
 
-.post(async(req,res,next)=>{
+.post(authenticate.verifyUser, async(req,res,next)=>{
     try {
         res.statusCode = 403;
         res.end('Post operation is not supported on dishes.');
@@ -95,7 +96,7 @@ commentRouter.route('/:dishId/comments/:commentId' )
     }
 })
 
-.put( async(req,res,next)=>{
+.put( authenticate.verifyUser, async(req,res,next)=>{
     try {
         const comment = await Comments.findById(req.params.commentId).exec();   
         if(!comment){
@@ -114,7 +115,7 @@ commentRouter.route('/:dishId/comments/:commentId' )
     }
 })
 
-.delete(async (req,res,next)=>{
+.delete(authenticate.verifyUser, async (req,res,next)=>{
     try {
         const comment = await Comments.findById(req.params.commentId).exec();   
         if(!comment){
